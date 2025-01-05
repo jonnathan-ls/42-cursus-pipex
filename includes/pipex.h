@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/04 22:13:54 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/05 20:40:57 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,9 @@
 # include "macros.h"
 # include "structs.h"
 
-int		exit_failure(char *message);
+void	exit_failure_with_message(char *error_message);
+void	free_and_exit_failure(t_fds *fds, char *err_msg);
+void	free_split(char **split);
 t_fds	*open_files(t_params *params);
 void	pipex(t_params *params, t_fds *fds, char **envp);
 

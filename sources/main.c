@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/04 22:21:54 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/05 20:36:33 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	main(int argc, char **argv, char **envp)
 	t_fds		*fds;
 
 	if (argc != 5)
-		return (exit_failure(INVALID_ARGUMENTS_ERROR_MESSAGE));
+		exit_failure_with_message(INVALID_ARGUMENTS_ERROR_MESSAGE);
 	configure_arguments(&params, argv);
 	fds = open_files(&params);
 	if (fds == NULL)
