@@ -14,15 +14,21 @@
 # define MACROS_H
 
 # define	SPACE_CHAR ' '
+# define DOUBLE_COLON_CHAR ':'
+# define SLASH_STRING "/"
 # define PROCESS_FAILURE -1
 # define LEFT_PIPE_PROCESS 0
+# define ACCESS_SUCCESS	0
 # define MODE_PERMISSION_FILE 0644
+# define PATH_ENV_VAR "PATH"
+# define PATH_ENV_VAR_LENGTH 4
 
-# define INVALID_ARGUMENTS_ERROR_MESSAGE "Usage: ./pipex file1 cmd1 cmd2 file2"
+# define INVALID_ARGUMENTS_ERROR_MESSAGE "Usage: ./pipex infile cmd1 cmd2 outfile"
 # define MALLOC_ERROR_MESSAGE	"Error: malloc failed"
 # define OPEN_INFILE_ERROR_MESSAGE "Error: failed to open infile"
 # define OPEN_OUTFILE_ERROR_MESSAGE "Error: failed to open outfile"
 # define PIPE_ERROR_MESSAGE "Error: failed to create pipe"
 # define FORK_ERROR_MESSAGE	"Error: failed to fork process"
 # define DUP2_ERROR_MESSAGE "Error: failed to duplicate file descriptor"
+# define EXECVE_ERROR_MESSAGE "Error: command not found"
 #endif

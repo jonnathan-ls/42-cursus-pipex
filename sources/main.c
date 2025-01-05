@@ -20,7 +20,6 @@ static void	configure_arguments(t_params *params, char **argv)
 	params->right_cmd_args = ft_split(argv[3], SPACE_CHAR);
 	params->infile_path = argv[1];
 	params->outfile_path = argv[4];
-	
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -35,6 +34,5 @@ int	main(int argc, char **argv, char **envp)
 	if (fds == NULL)
 		return (EXIT_FAILURE);
 	pipex(&params, fds, envp);
-
 	return (EXIT_SUCCESS);
 }
