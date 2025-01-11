@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/05 20:31:40 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/11 19:33:17 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,28 +14,33 @@
 # define MACROS_H
 
 # define SPACE_CHAR ' '
+# define SLASH_CHAR '/'
 # define DOUBLE_COLON_CHAR ':'
-# define SLASH_STRING "/"
+
+# define PERROR 1
+# define NO_PERROR 0
+# define ACCESS_SUCCESS	0
 # define PROCESS_FAILURE -1
 # define LEFT_PIPE_PROCESS 0
-# define ACCESS_SUCCESS	0
-# define MODE_PERMISSION_FILE 0644
-# define PATH_ENV_VAR "PATH"
 # define PATH_ENV_VAR_LENGTH 4
+# define MODE_PERMISSION_FILE 0644
 
-# define EXIT_SUCCESS_MESSAGE "✅ program terminated successfully\n"
-# define ICON_FAILURE "❌ Error: "
-#define EXIT_FAILURE_MESSAGE "program terminated with failure\n"
-# define INVALID_ARGUMENTS_ERROR_MESSAGE \
-"\n\033[31mError: Bad arguments\n\e[0m\n \
-Correct Format: ./pipex <file1> <cmd1> <cmd2> <file2>\n"
-# define MALLOC_ERROR_MESSAGE	"malloc failed"
-# define OPEN_INFILE_ERROR_MESSAGE "failed to open infile"
-# define OPEN_OUTFILE_ERROR_MESSAGE "failed to open outfile"
-# define PIPE_ERROR_MESSAGE "failed to create pipe"
-# define FORK_ERROR_MESSAGE	"failed to fork process"
-# define DUP2_ERROR_MESSAGE "failed to duplicate file descriptor"
-# define COMMAND_NOT_FOUND_ERROR_MESSAGE	"command not found"
-# define EXECVE_ERROR_MESSAGE "failed to execute command"
+# define SLASH_STRING "/"
+# define PATH_ENV_VAR "PATH"
+# define COLOR_RESET	"\033[0m"
+# define COLOR_ERROR	"\033[0;31m"
+# define EXIT_FAILURE_MSG "Error: [ x ] "
+# define INVALID_ARGS_ERR_MSG "Correct Format: \
+./pipex <file1> <cmd1> <cmd2> <file2>\n"
+# define MALLOC_MSG	"malloc failed"
+# define PIPE_MSG "failed to create pipe"
+# define FORK_MSG "failed to fork process"
+# define EXECVE_MSG "failed to execute command"
+# define OPEN_INFILE_MSG "failed to open infile"
+# define OPEN_OUTFILE_MSG "failed to open outfile"
+# define COMMAND_NOT_FOUND_MSG	"command not found"
+# define DUP2_MSG "failed to duplicate file descriptor"
+# define INVALID_LEFT_PIPE_CMD_MSG "Left pipe not could be empty"
+# define INVALID_RIGHT_PIPE_CMD_MSG "Right pipe not could be empty"
 
 #endif
