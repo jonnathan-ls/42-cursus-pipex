@@ -1,0 +1,5 @@
+**/*.o
+**/*.a
+pipex
+outfile
+--show-leak-kinds=all --leak-check=full --track-origins=yes --track-fds=all --trace-children=yes

@@ -53,18 +53,20 @@ static char	*find_executable_path(char *cmd, char **envp)
 	return (NULL);
 }
 
-static void	execute_command(char **cmd_args, char **envp, t_fds *fds)
+static void	execute_command(t_params *params, char **cmd_args, char **envp, t_fds *fds)
 {
 	char	*executable_path;
 
 	executable_path = find_executable_path(cmd_args[0], envp);
-	if (!executable_path)
-		free_and_exit_failure(fds, COMMAND_NOT_FOUND_ERROR_MESSAGE);
+	if (!executable_path) {
+		ft_putstr_fd(cmd_args[0], STDERR_FILENO);
+		free_and_exit_failure(params, fds, COMMAND_NOT_FOUND_ERROR_MESSAGE);
+	}
 	cmd_args[0] = executable_path;
 	if (execve(executable_path, cmd_args, envp) == PROCESS_FAILURE)
 	{
 		free(executable_path);
-		free_and_exit_failure(fds, EXECVE_ERROR_MESSAGE);
+		free_and_exit_failure(params, fds, EXECVE_ERROR_MESSAGE);
 	}
 	free(executable_path);
 }
@@ -75,17 +77,17 @@ void	pipex(t_params *params, t_fds *fds, char **envp)
 	pid_t	pid_process;
 
 	if (pipe(pipefd) == PROCESS_FAILURE)
-		free_and_exit_failure(fds, PIPE_ERROR_MESSAGE);
+		free_and_exit_failure(params, fds, PIPE_ERROR_MESSAGE);
 	pid_process = fork();
 	if (pid_process == PROCESS_FAILURE)
-		free_and_exit_failure(fds, FORK_ERROR_MESSAGE);
+		free_and_exit_failure(params, fds, FORK_ERROR_MESSAGE);
 	if (pid_process == LEFT_PIPE_PROCESS)
 	{
 		dup2(fds->infile, STDIN_FILENO);
 		dup2(pipefd[1], STDOUT_FILENO);
 		close(pipefd[0]);
 		close(fds->infile);
-		execute_command(params->left_cmd_args, envp, fds);
+		execute_command(params, params->left_cmd_args, envp, fds);
 	}
 	else
 	{
@@ -93,6 +95,6 @@ void	pipex(t_params *params, t_fds *fds, char **envp)
 		dup2(fds->outfile, STDOUT_FILENO);
 		close(pipefd[1]);
 		close(fds->outfile);
-		execute_command(params->right_cmd_args, envp, fds);
+		execute_command(params, params->right_cmd_args, envp, fds);
 	}
 }
