@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/11 19:33:17 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/13 21:52:42 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 # define COLOR_RESET	"\033[0m"
 # define COLOR_ERROR	"\033[0;31m"
 # define EXIT_FAILURE_MSG "Error: [ x ] "
-# define INVALID_ARGS_ERR_MSG "Correct Format: \
+# define INVALID_ARGS_ERR_MSG "Invalid Arguments - Correct Format: \
 ./pipex <file1> <cmd1> <cmd2> <file2>\n"
 # define MALLOC_MSG	"malloc failed"
 # define PIPE_MSG "failed to create pipe"

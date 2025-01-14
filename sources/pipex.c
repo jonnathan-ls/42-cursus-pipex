@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/11 19:30:06 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/13 22:09:58 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ static char	*find_executable_path(char *cmd, char **envp)
 		free(partial_path);
 		if (!final_path)
 			return (free_split(path_tokens), NULL);
-		if (access(final_path, F_OK) == ACCESS_SUCCESS)
+		if (access(final_path, F_OK | X_OK) == ACCESS_SUCCESS)
 			return (free_split(path_tokens), final_path);
 		free(final_path);
 		index++;
@@ -59,7 +59,7 @@ static void	execute_command(t_params *params, char **cmd_args, char **envp)
 
 	if (ft_strchr(cmd_args[0], SLASH_CHAR))
 	{
-		if (access(cmd_args[0], F_OK) == ACCESS_SUCCESS)
+		if (access(cmd_args[0], F_OK | X_OK) == ACCESS_SUCCESS)
 			executable_path = cmd_args[0];
 		else
 			executable_path = NULL;
@@ -70,13 +70,13 @@ static void	execute_command(t_params *params, char **cmd_args, char **envp)
 	{
 		ft_putstr_fd(cmd_args[0], STDERR_FILENO);
 		ft_putstr_fd(" => ", STDERR_FILENO);
-		free_and_exit_failure(COMMAND_NOT_FOUND_MSG, params);
+		free_and_exit_failure(COMMAND_NOT_FOUND_MSG, params, PERROR);
 	}
 	cmd_args[0] = executable_path;
 	if (execve(executable_path, cmd_args, envp) == PROCESS_FAILURE)
 	{
 		free(executable_path);
-		free_and_exit_failure(EXECVE_MSG, params);
+		free_and_exit_failure(EXECVE_MSG, params, PERROR);
 	}
 	free(executable_path);
 }
@@ -87,24 +87,24 @@ void	pipex(t_params *params, char **envp)
 	pid_t	pid_process;
 
 	if (pipe(pipefd) == PROCESS_FAILURE)
-		free_and_exit_failure(PIPE_MSG, params);
+		free_and_exit_failure(PIPE_MSG, params, NO_PERROR);
 	pid_process = fork();
 	if (pid_process == PROCESS_FAILURE)
-		free_and_exit_failure(FORK_MSG, params);
+		free_and_exit_failure(FORK_MSG, params, NO_PERROR);
 	if (pid_process == LEFT_PIPE_PROCESS)
 	{
-		dup2(params->fds->input_file, STDIN_FILENO);
+		dup2(params->fds.input_file, STDIN_FILENO);
 		dup2(pipefd[1], STDOUT_FILENO);
 		close(pipefd[0]);
-		close(params->fds->input_file);
+		close(params->fds.input_file);
 		execute_command(params, params->left_cmd_args, envp);
 	}
 	else
 	{
 		dup2(pipefd[0], STDIN_FILENO);
-		dup2(params->fds->output_file, STDOUT_FILENO);
+		dup2(params->fds.output_file, STDOUT_FILENO);
 		close(pipefd[1]);
-		close(params->fds->output_file);
+		close(params->fds.output_file);
 		execute_command(params, params->right_cmd_args, envp);
 	}
 }

@@ -8,7 +8,6 @@ LIBS_DIR = ./libraries
 SOURCES = $(SRCS_DIR)/main.c \
 	$(SRCS_DIR)/utils.c \
 	$(SRCS_DIR)/pipex.c \
-	$(SRCS_DIR)/errors.c \
 
 OBJECTS = $(SOURCES:$(SRCS_DIR)/%.c=$(OBJS_DIR)/%.o)
 
