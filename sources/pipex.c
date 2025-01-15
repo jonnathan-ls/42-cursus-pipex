@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/13 22:09:58 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/14 22:17:08 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,30 +81,51 @@ static void	execute_command(t_params *params, char **cmd_args, char **envp)
 	free(executable_path);
 }
 
+static void	exec_process(t_params *p, int *fd, char **envp, int side)
+{
+	if (side == LEFT_PIPE)
+	{
+		dup2(p->fds.input_file, STDIN_FILENO);
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[0]);
+		close(p->fds.input_file);
+		execute_command(p, p->left_cmd_args, envp);
+	}
+	else if (side == RIGHT_PIPE)
+	{
+		dup2(fd[0], STDIN_FILENO);
+		dup2(p->fds.output_file, STDOUT_FILENO);
+		close(fd[1]);
+		close(p->fds.output_file);
+		execute_command(p, p->right_cmd_args, envp);
+	}
+}
+
 void	pipex(t_params *params, char **envp)
 {
 	int		pipefd[2];
-	pid_t	pid_process;
+	pid_t	pid_child_process[2];
 
 	if (pipe(pipefd) == PROCESS_FAILURE)
-		free_and_exit_failure(PIPE_MSG, params, NO_PERROR);
-	pid_process = fork();
-	if (pid_process == PROCESS_FAILURE)
-		free_and_exit_failure(FORK_MSG, params, NO_PERROR);
-	if (pid_process == LEFT_PIPE_PROCESS)
+		free_and_exit_failure(PIPE_MSG, params, PERROR);
+	pid_child_process[0] = fork();
+	if (pid_child_process[0] == PROCESS_FAILURE)
+		free_and_exit_failure(FORK_MSG, params, PERROR);
+	if (pid_child_process[0] == 0)
 	{
-		dup2(params->fds.input_file, STDIN_FILENO);
-		dup2(pipefd[1], STDOUT_FILENO);
 		close(pipefd[0]);
-		close(params->fds.input_file);
-		execute_command(params, params->left_cmd_args, envp);
+		exec_process(params, pipefd, envp, LEFT_PIPE);
 	}
-	else
+	pid_child_process[1] = fork();
+	if (pid_child_process[1] == PROCESS_FAILURE)
+		free_and_exit_failure(FORK_MSG, params, PERROR);
+	if (pid_child_process[1] == 0)
 	{
-		dup2(pipefd[0], STDIN_FILENO);
-		dup2(params->fds.output_file, STDOUT_FILENO);
 		close(pipefd[1]);
-		close(params->fds.output_file);
-		execute_command(params, params->right_cmd_args, envp);
+		exec_process(params, pipefd, envp, RIGHT_PIPE);
 	}
+	close(pipefd[0]);
+	close(pipefd[1]);
+	waitpid(pid_child_process[0], NULL, 0);
+	waitpid(pid_child_process[1], NULL, 0);
 }
