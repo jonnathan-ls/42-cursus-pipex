@@ -60,10 +60,12 @@ static char	*find_executable_path(char *cmd, char **envp)
 static void	execute_command(t_params *params, char **cmd_args, char **envp)
 {
 	char	*executable_path;
+	char	*original_cmd;
 
 	if (!cmd_args || !envp)
 		free_and_exit_failure("Invalid arguments", params, NO_PERROR);
 
+	original_cmd = cmd_args[0];
 	if (ft_strchr(cmd_args[0], SLASH_CHAR))
 	{
 		if (access(cmd_args[0], F_OK | X_OK) == ACCESS_SUCCESS)
@@ -80,12 +82,10 @@ static void	execute_command(t_params *params, char **cmd_args, char **envp)
 		free_and_exit_failure(COMMAND_NOT_FOUND_MSG, params, PERROR);
 	}
 	cmd_args[0] = executable_path;
-	if (execve(executable_path, cmd_args, envp) == PROCESS_FAILURE)
-	{
-		free(executable_path);
-		free_and_exit_failure(EXECVE_MSG, params, PERROR);
-	}
+	execve(executable_path, cmd_args, envp);
+	cmd_args[0] = original_cmd;
 	free(executable_path);
+	free_and_exit_failure(EXECVE_MSG, params, PERROR);
 }
 
 static void	exec_process(t_params *p, int *fd, char **envp, int side)
@@ -109,15 +109,23 @@ static void	exec_process(t_params *p, int *fd, char **envp, int side)
 	}
 	else if (side == RIGHT_PIPE)
 	{
-		dup2(fd[0], STDIN_FILENO);
-		dup2(p->fds.output_file, STDOUT_FILENO);
+		if (dup2(fd[0], STDIN_FILENO) == -1)
+		{
+			close(fd[1]);
+			free_and_exit_failure("dup2 failed", p, PERROR);
+		}
+		if (dup2(p->fds.output_file, STDOUT_FILENO) == -1)
+		{
+			close(fd[1]);
+			free_and_exit_failure("dup2 failed", p, PERROR);
+		}
 		close(fd[1]);
 		close(p->fds.output_file);
 		execute_command(p, p->right_cmd_args, envp);
 	}
 }
 
-void	pipex(t_params *params, char **envp)
+int	pipex(t_params *params, char **envp)
 {
 	int		pipefd[2];
 	pid_t	pid_child_process[2];
@@ -155,5 +163,5 @@ void	pipex(t_params *params, char **envp)
 	if (status != 0)
 		free_and_exit_failure("Command failed", params, NO_PERROR);
 	waitpid(pid_child_process[1], &status, 0);
-	exit(status);
+	return (status);
 }

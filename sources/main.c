@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/13 22:00:03 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/29 00:12:21 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ static void	configure_arguments(t_params *params, char **argv)
 int	main(int argc, char **argv, char **envp)
 {
 	t_params	params;
+	int         status;
 
 	params.left_cmd_args = NULL;
 	params.right_cmd_args = NULL;
@@ -52,8 +53,8 @@ int	main(int argc, char **argv, char **envp)
 	if (argc != 5)
 		free_and_exit_failure(INVALID_ARGS_ERR_MSG, &params, NO_PERROR);
 	configure_arguments(&params, argv);
-	pipex(&params, envp);
+	status = pipex(&params, envp);
 	free_split(params.left_cmd_args);
 	free_split(params.right_cmd_args);
-	return (EXIT_SUCCESS);
+	return (status);
 }
