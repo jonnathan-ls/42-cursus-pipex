@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/13 22:01:18 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/29 00:51:40 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	free_split(char **split)
 	int	i;
 
 	if (!split)
-		return;
+		return ;
 	i = 0;
 	while (split[i])
 	{
@@ -33,7 +33,6 @@ void	free_and_exit_failure(char *err_msg, t_params *params, int perror_msg)
 {
 	if (!params)
 		exit(EXIT_FAILURE);
-	
 	if (params->left_cmd_args)
 		free_split(params->left_cmd_args);
 	if (params->right_cmd_args)
@@ -47,4 +46,12 @@ void	free_and_exit_failure(char *err_msg, t_params *params, int perror_msg)
 	else
 		ft_putstr_fd(err_msg, STDERR_FILENO);
 	exit(EXIT_FAILURE);
+}
+
+void	exec_process(t_params *p, int *fd, char **envp, int side)
+{
+	if (side == LEFT_PIPE)
+		handle_left_pipe(p, fd, envp);
+	else
+		handle_right_pipe(p, fd, envp);
 }

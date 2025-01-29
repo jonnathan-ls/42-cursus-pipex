@@ -14,115 +14,31 @@
 #include "libft.h"
 #include "ft_printf.h"
 
-static char	*get_path_token(char **envp)
+static void	validates_pipes_commands_args(t_params *params)
 {
-	int	index;
-
-	if (!envp)
-		return (NULL);
-	index = 0;
-	while (envp[index] && !ft_strnstr(envp[index], PATH_ENV_VAR, PATH_ENV_VAR_LENGTH))
-		index++;
-	if (!envp[index])
-		return (NULL);
-	return (envp[index] + PATH_ENV_VAR_LENGTH + 1);
+	if (params->left_cmd_args == NULL || params->right_cmd_args == NULL)
+		free_and_exit_failure(MALLOC_MSG, params, NO_PERROR);
+	if (params->left_cmd_args[0] == NULL || params->right_cmd_args[0] == NULL)
+		free_and_exit_failure(INVALID_LEFT_PIPE_CMD_MSG, params, NO_PERROR);
 }
 
-static char	*find_executable_path(char *cmd, char **envp)
+static void	validates_fds_open_files(t_params *params)
 {
-	char	**path_tokens;
-	char	*partial_path;
-	char	*final_path;
-	int		index;
-
-	index = 0;
-	path_tokens = ft_split(get_path_token(envp), DOUBLE_COLON_CHAR);
-	if (!path_tokens)
-		return (NULL);
-	while (path_tokens[index])
-	{
-		partial_path = ft_strjoin(path_tokens[index], SLASH_STRING);
-		if (!partial_path)
-			return (free_split(path_tokens), NULL);
-		final_path = ft_strjoin(partial_path, cmd);
-		free(partial_path);
-		if (!final_path)
-			return (free_split(path_tokens), NULL);
-		if (access(final_path, F_OK | X_OK) == ACCESS_SUCCESS)
-			return (free_split(path_tokens), final_path);
-		free(final_path);
-		index++;
-	}
-	free_split(path_tokens);
-	return (NULL);
+	if (params->fds.input_file == PROCESS_FAILURE)
+		free_and_exit_failure(OPEN_INFILE_MSG, params, PERROR);
+	if (params->fds.output_file == PROCESS_FAILURE)
+		free_and_exit_failure(OPEN_OUTFILE_MSG, params, PERROR);
 }
 
-static void	execute_command(t_params *params, char **cmd_args, char **envp)
+static void	configure_arguments(t_params *params, char **argv)
 {
-	char	*executable_path;
-	char	*original_cmd;
-
-	if (!cmd_args || !envp)
-		free_and_exit_failure("Invalid arguments", params, NO_PERROR);
-
-	original_cmd = cmd_args[0];
-	if (ft_strchr(cmd_args[0], SLASH_CHAR))
-	{
-		if (access(cmd_args[0], F_OK | X_OK) == ACCESS_SUCCESS)
-			executable_path = cmd_args[0];
-		else
-			executable_path = NULL;
-	}
-	else
-		executable_path = find_executable_path(cmd_args[0], envp);
-	if (!executable_path)
-	{
-		ft_putstr_fd(cmd_args[0], STDERR_FILENO);
-		ft_putstr_fd(" => ", STDERR_FILENO);
-		free_and_exit_failure(COMMAND_NOT_FOUND_MSG, params, PERROR);
-	}
-	cmd_args[0] = executable_path;
-	execve(executable_path, cmd_args, envp);
-	cmd_args[0] = original_cmd;
-	free(executable_path);
-	free_and_exit_failure(EXECVE_MSG, params, PERROR);
-}
-
-static void	exec_process(t_params *p, int *fd, char **envp, int side)
-{
-	if (side == LEFT_PIPE)
-	{
-		close(fd[0]);
-		if (dup2(p->fds.input_file, STDIN_FILENO) == -1)
-		{
-			close(fd[1]);
-			free_and_exit_failure("dup2 failed", p, PERROR);
-		}
-		if (dup2(fd[1], STDOUT_FILENO) == -1)
-		{
-			close(fd[1]);
-			free_and_exit_failure("dup2 failed", p, PERROR);
-		}
-		close(fd[1]);
-		close(p->fds.input_file);
-		execute_command(p, p->left_cmd_args, envp);
-	}
-	else if (side == RIGHT_PIPE)
-	{
-		if (dup2(fd[0], STDIN_FILENO) == -1)
-		{
-			close(fd[1]);
-			free_and_exit_failure("dup2 failed", p, PERROR);
-		}
-		if (dup2(p->fds.output_file, STDOUT_FILENO) == -1)
-		{
-			close(fd[1]);
-			free_and_exit_failure("dup2 failed", p, PERROR);
-		}
-		close(fd[1]);
-		close(p->fds.output_file);
-		execute_command(p, p->right_cmd_args, envp);
-	}
+	params->left_cmd_args = ft_split(argv[2], SPACE_CHAR);
+	params->right_cmd_args = ft_split(argv[3], SPACE_CHAR);
+	validates_pipes_commands_args(params);
+	params->fds.input_file = open(argv[1], O_RDONLY);
+	params->fds.output_file = open(argv[4],
+			O_WRONLY | O_CREAT | O_TRUNC, MODE_PERMISSION_FILE);
+	validates_fds_open_files(params);
 }
 
 int	pipex(t_params *params, char **envp)
@@ -133,35 +49,33 @@ int	pipex(t_params *params, char **envp)
 
 	if (pipe(pipefd) == PROCESS_FAILURE)
 		free_and_exit_failure(PIPE_MSG, params, PERROR);
-	pid_child_process[0] = fork();
-	if (pid_child_process[0] == PROCESS_FAILURE)
-	{
-		close(pipefd[0]);
-		close(pipefd[1]);
-		free_and_exit_failure(FORK_MSG, params, PERROR);
-	}
-	if (pid_child_process[0] == 0)
-	{
-		close(pipefd[0]);
-		exec_process(params, pipefd, envp, LEFT_PIPE);
-	}
-	pid_child_process[1] = fork();
-	if (pid_child_process[1] == PROCESS_FAILURE)
-	{
-		close(pipefd[0]);
-		close(pipefd[1]);
-		free_and_exit_failure(FORK_MSG, params, PERROR);
-	}
-	if (pid_child_process[1] == 0)
-	{
-		close(pipefd[1]);
-		exec_process(params, pipefd, envp, RIGHT_PIPE);
-	}
+	if (create_first_child(
+			params, envp, pipefd, &pid_child_process[0]) == PROCESS_FAILURE)
+		return (PROCESS_FAILURE);
+	if (create_second_child(
+			params, envp, pipefd, &pid_child_process[1]) == PROCESS_FAILURE)
+		return (PROCESS_FAILURE);
 	close(pipefd[0]);
 	close(pipefd[1]);
-	waitpid(pid_child_process[0], &status, 0);
-	if (status != 0)
-		free_and_exit_failure("Command failed", params, NO_PERROR);
 	waitpid(pid_child_process[1], &status, 0);
+	waitpid(pid_child_process[0], &status, 0);
+	return (status);
+}
+
+int	main(int argc, char **argv, char **envp)
+{
+	t_params	params;
+	int			status;
+
+	params.left_cmd_args = NULL;
+	params.right_cmd_args = NULL;
+	params.fds.input_file = PROCESS_FAILURE;
+	params.fds.output_file = PROCESS_FAILURE;
+	if (argc != 5)
+		free_and_exit_failure(INVALID_ARGS_ERR_MSG, &params, NO_PERROR);
+	configure_arguments(&params, argv);
+	status = pipex(&params, envp);
+	free_split(params.left_cmd_args);
+	free_split(params.right_cmd_args);
 	return (status);
 }

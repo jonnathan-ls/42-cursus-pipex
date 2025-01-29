@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/14 22:17:41 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/29 00:31:25 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # define NO_PERROR 0
 # define ACCESS_SUCCESS	0
 # define PROCESS_FAILURE -1
+# define PROCESS_SUCCESS 0
 # define LEFT_PIPE 0
 # define RIGHT_PIPE 1
 # define READ_END	0

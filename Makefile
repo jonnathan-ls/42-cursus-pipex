@@ -5,9 +5,11 @@ OBJS_DIR = ./objects
 INCLUDES_DIR = ./includes
 LIBS_DIR = ./libraries
 
-SOURCES = $(SRCS_DIR)/main.c \
+SOURCES = \
 	$(SRCS_DIR)/utils.c \
 	$(SRCS_DIR)/pipex.c \
+	$(SRCS_DIR)/path_utils.c \
+	$(SRCS_DIR)/process_utils.c
 
 OBJECTS = $(SOURCES:$(SRCS_DIR)/%.c=$(OBJS_DIR)/%.o)
 
