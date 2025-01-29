@@ -18,9 +18,13 @@ static char	*get_path_token(char **envp)
 {
 	int	index;
 
+	if (!envp)
+		return (NULL);
 	index = 0;
-	while (!ft_strnstr(envp[index], PATH_ENV_VAR, PATH_ENV_VAR_LENGTH))
+	while (envp[index] && !ft_strnstr(envp[index], PATH_ENV_VAR, PATH_ENV_VAR_LENGTH))
 		index++;
+	if (!envp[index])
+		return (NULL);
 	return (envp[index] + PATH_ENV_VAR_LENGTH + 1);
 }
 
@@ -57,6 +61,9 @@ static void	execute_command(t_params *params, char **cmd_args, char **envp)
 {
 	char	*executable_path;
 
+	if (!cmd_args || !envp)
+		free_and_exit_failure("Invalid arguments", params, NO_PERROR);
+
 	if (ft_strchr(cmd_args[0], SLASH_CHAR))
 	{
 		if (access(cmd_args[0], F_OK | X_OK) == ACCESS_SUCCESS)
@@ -85,9 +92,18 @@ static void	exec_process(t_params *p, int *fd, char **envp, int side)
 {
 	if (side == LEFT_PIPE)
 	{
-		dup2(p->fds.input_file, STDIN_FILENO);
-		dup2(fd[1], STDOUT_FILENO);
 		close(fd[0]);
+		if (dup2(p->fds.input_file, STDIN_FILENO) == -1)
+		{
+			close(fd[1]);
+			free_and_exit_failure("dup2 failed", p, PERROR);
+		}
+		if (dup2(fd[1], STDOUT_FILENO) == -1)
+		{
+			close(fd[1]);
+			free_and_exit_failure("dup2 failed", p, PERROR);
+		}
+		close(fd[1]);
 		close(p->fds.input_file);
 		execute_command(p, p->left_cmd_args, envp);
 	}
@@ -105,12 +121,17 @@ void	pipex(t_params *params, char **envp)
 {
 	int		pipefd[2];
 	pid_t	pid_child_process[2];
+	int		status;
 
 	if (pipe(pipefd) == PROCESS_FAILURE)
 		free_and_exit_failure(PIPE_MSG, params, PERROR);
 	pid_child_process[0] = fork();
 	if (pid_child_process[0] == PROCESS_FAILURE)
+	{
+		close(pipefd[0]);
+		close(pipefd[1]);
 		free_and_exit_failure(FORK_MSG, params, PERROR);
+	}
 	if (pid_child_process[0] == 0)
 	{
 		close(pipefd[0]);
@@ -118,7 +139,11 @@ void	pipex(t_params *params, char **envp)
 	}
 	pid_child_process[1] = fork();
 	if (pid_child_process[1] == PROCESS_FAILURE)
+	{
+		close(pipefd[0]);
+		close(pipefd[1]);
 		free_and_exit_failure(FORK_MSG, params, PERROR);
+	}
 	if (pid_child_process[1] == 0)
 	{
 		close(pipefd[1]);
@@ -126,6 +151,9 @@ void	pipex(t_params *params, char **envp)
 	}
 	close(pipefd[0]);
 	close(pipefd[1]);
-	waitpid(pid_child_process[0], NULL, 0);
-	waitpid(pid_child_process[1], NULL, 0);
+	waitpid(pid_child_process[0], &status, 0);
+	if (status != 0)
+		free_and_exit_failure("Command failed", params, NO_PERROR);
+	waitpid(pid_child_process[1], &status, 0);
+	exit(status);
 }

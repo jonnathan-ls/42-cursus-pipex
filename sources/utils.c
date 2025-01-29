@@ -18,6 +18,8 @@ void	free_split(char **split)
 {
 	int	i;
 
+	if (!split)
+		return;
 	i = 0;
 	while (split[i])
 	{
@@ -29,9 +31,12 @@ void	free_split(char **split)
 
 void	free_and_exit_failure(char *err_msg, t_params *params, int perror_msg)
 {
-	if (params->left_cmd_args != NULL)
+	if (!params)
+		exit(EXIT_FAILURE);
+	
+	if (params->left_cmd_args)
 		free_split(params->left_cmd_args);
-	if (params->right_cmd_args != NULL)
+	if (params->right_cmd_args)
 		free_split(params->right_cmd_args);
 	if (params->fds.input_file > STDERR_FILENO)
 		close(params->fds.input_file);
