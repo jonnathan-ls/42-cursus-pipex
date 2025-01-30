@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/30 20:47:09 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 20:55:11 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,21 +21,19 @@ static void	handle_signals(void)
 	signal(SIGQUIT, SIG_DFL);
 }
 
-static int	wait_for_children(pid_t pid1, pid_t pid2)
+static int	wait_for_children(pid_t pid_child_one, pid_t pid_child_two)
 {
 	int	status;
 	int	exit_status;
 
-	waitpid(pid1, &status, 0);
+	waitpid(pid_child_two, &status, 0);
+	waitpid(pid_child_one, NULL, 0);
 	if (WIFEXITED(status))
 		exit_status = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		exit_status = SIGNAL_BASE + WTERMSIG(status);
 	else
 		exit_status = 1;
-	waitpid(pid2, &status, 0);
-	if (WIFSIGNALED(status))
-		exit_status = SIGNAL_BASE + WTERMSIG(status);
-	else if (WIFEXITED(status))
-		exit_status = WEXITSTATUS(status);
 	return (exit_status);
 }
 
@@ -51,8 +49,8 @@ int	pipex(t_params *params, char **envp)
 		return (PROCESS_FAILURE);
 	if (create_second_child(params, envp, pipefd, &pid_child_process[1]))
 		return (PROCESS_FAILURE);
-	close(pipefd[1]);
 	close(pipefd[0]);
+	close(pipefd[1]);
 	return (wait_for_children(pid_child_process[0], pid_child_process[1]));
 }
 
