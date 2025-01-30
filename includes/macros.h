@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/29 00:31:25 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 00:39:15 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,16 @@
 # define DOUBLE_COLON_CHAR ':'
 
 # define PERROR 1
-# define NO_PERROR 0
-# define ACCESS_SUCCESS	0
-# define PROCESS_FAILURE -1
-# define PROCESS_SUCCESS 0
-# define LEFT_PIPE 0
-# define RIGHT_PIPE 1
 # define READ_END	0
+# define LEFT_PIPE 0
+# define NO_PERROR 0
 # define WRITE_END	1
+# define RIGHT_PIPE 1
+# define SIGNAL_BASE 128
+# define ACCESS_SUCCESS	0
+# define PROCESS_SUCCESS 0
 # define CHILDREN_PROCESS 0
+# define PROCESS_FAILURE -1
 # define PATH_ENV_VAR_LENGTH 4
 # define MODE_PERMISSION_FILE 0644
 
@@ -45,7 +46,6 @@
 # define OPEN_OUTFILE_MSG "failed to open outfile"
 # define COMMAND_NOT_FOUND_MSG	"command not found"
 # define DUP2_MSG "failed to duplicate file descriptor"
-# define INVALID_LEFT_PIPE_CMD_MSG "Left pipe not could be empty"
-# define INVALID_RIGHT_PIPE_CMD_MSG "Right pipe not could be empty"
+# define INVALID_PIPE_CMD_MSG "Pipe not could be empty"
 
 #endif

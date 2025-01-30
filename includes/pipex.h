@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/29 00:54:10 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 00:36:43 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	handle_right_pipe(t_params *p, int *fd, char **envp);
 
 // Memory management
 void	free_split(char **split);
-void	free_and_exit_failure(char *err_msg, t_params *params, int perror);
+void	free_and_exit_failure(
+	char *err_msg, t_params *params, int perror_msg, int exit_status);
 
 #endif

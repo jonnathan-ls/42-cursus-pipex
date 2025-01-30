@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/29 00:51:40 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 00:36:56 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,9 @@ void	free_split(char **split)
 	free(split);
 }
 
-void	free_and_exit_failure(char *err_msg, t_params *params, int perror_msg)
+void	free_and_exit_failure(
+	char *err_msg, t_params *params, int perror_msg, int exit_status)
 {
-	if (!params)
-		exit(EXIT_FAILURE);
 	if (params->left_cmd_args)
 		free_split(params->left_cmd_args);
 	if (params->right_cmd_args)
@@ -45,7 +44,7 @@ void	free_and_exit_failure(char *err_msg, t_params *params, int perror_msg)
 		perror(err_msg);
 	else
 		ft_putstr_fd(err_msg, STDERR_FILENO);
-	exit(EXIT_FAILURE);
+	exit(exit_status);
 }
 
 void	exec_process(t_params *p, int *fd, char **envp, int side)

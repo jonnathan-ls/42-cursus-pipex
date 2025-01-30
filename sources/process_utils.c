@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/29 00:53:10 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 00:50:02 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,22 @@
 
 static void	execute_command(t_params *params, char **cmd_args, char **envp)
 {
-	char	*executable_path;
-	char	*original_cmd;
+	char	*path;
 
-	if (!cmd_args || !envp)
-		free_and_exit_failure("Invalid arguments", params, NO_PERROR);
-	original_cmd = cmd_args[0];
-	executable_path = get_executable_path(cmd_args[0], envp);
-	if (!executable_path)
+	if (!cmd_args || !cmd_args[0])
 	{
-		ft_putstr_fd(cmd_args[0], STDERR_FILENO);
-		ft_putstr_fd(" => ", STDERR_FILENO);
-		free_and_exit_failure(COMMAND_NOT_FOUND_MSG, params, PERROR);
+		free_and_exit_failure("Invalid command", params, PERROR, EXIT_FAILURE);
 	}
-	cmd_args[0] = executable_path;
-	execve(executable_path, cmd_args, envp);
-	cmd_args[0] = original_cmd;
-	free(executable_path);
-	free_and_exit_failure(EXECVE_MSG, params, PERROR);
+	path = get_executable_path(cmd_args[0], envp);
+	if (!path)
+	{
+		ft_putstr_fd(cmd_args[0], 2);
+		free_and_exit_failure(": command not found\n", params, PERROR, 127);
+	}
+	execve(path, cmd_args, envp);
+	free(path);
+	perror(cmd_args[0]);
+	free_and_exit_failure(NULL, params, PERROR, 126);
 }
 
 int	create_first_child(t_params *params, char **envp, int *pipefd, pid_t *pid)
@@ -43,7 +41,7 @@ int	create_first_child(t_params *params, char **envp, int *pipefd, pid_t *pid)
 	{
 		close(pipefd[0]);
 		close(pipefd[1]);
-		free_and_exit_failure(FORK_MSG, params, PERROR);
+		free_and_exit_failure(FORK_MSG, params, PERROR, EXIT_FAILURE);
 	}
 	if (*pid == 0)
 	{
@@ -60,7 +58,7 @@ int	create_second_child(t_params *params, char **envp, int *pipefd, pid_t *pid)
 	{
 		close(pipefd[0]);
 		close(pipefd[1]);
-		free_and_exit_failure(FORK_MSG, params, PERROR);
+		free_and_exit_failure(FORK_MSG, params, PERROR, EXIT_FAILURE);
 	}
 	if (*pid == 0)
 	{
@@ -76,13 +74,13 @@ void	handle_left_pipe(t_params *p, int *fd, char **envp)
 	{
 		close(fd[1]);
 		close(fd[0]);
-		free_and_exit_failure("dup2 failed", p, PERROR);
+		free_and_exit_failure("dup2 failed", p, PERROR, EXIT_FAILURE);
 	}
 	if (dup2(fd[1], STDOUT_FILENO) == -1)
 	{
 		close(fd[1]);
 		close(fd[0]);
-		free_and_exit_failure("dup2 failed", p, PERROR);
+		free_and_exit_failure("dup2 failed", p, PERROR, EXIT_FAILURE);
 	}
 	close(fd[0]);
 	close(fd[1]);
@@ -96,12 +94,12 @@ void	handle_right_pipe(t_params *p, int *fd, char **envp)
 	if (dup2(fd[0], STDIN_FILENO) == -1)
 	{
 		close(fd[0]);
-		free_and_exit_failure("dup2 failed", p, PERROR);
+		free_and_exit_failure("dup2 failed", p, PERROR, EXIT_FAILURE);
 	}
 	if (dup2(p->fds.output_file, STDOUT_FILENO) == -1)
 	{
 		close(fd[0]);
-		free_and_exit_failure("dup2 failed", p, PERROR);
+		free_and_exit_failure("dup2 failed", p, PERROR, EXIT_FAILURE);
 	}
 	close(fd[1]);
 	close(fd[0]);
