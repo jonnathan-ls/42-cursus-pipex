@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/29 00:55:00 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 20:25:53 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,41 @@ static char	*get_path_token(char **envp)
 	return (envp[index] + PATH_ENV_VAR_LENGTH + 1);
 }
 
+static char	*search_tokens(char *cmd, char **tokens, int index)
+{
+	char	*partial;
+	char	*final;
+
+	partial = ft_strjoin(tokens[index], SLASH_STRING);
+	if (!partial)
+		return (free_split(tokens), NULL);
+	final = ft_strjoin(partial, cmd);
+	free(partial);
+	if (!final)
+		return (free_split(tokens), NULL);
+	return (final);
+}
+
+char	*search_in_path_tokens(char *cmd, char **path_tokens)
+{
+	char	*final_path;
+	int		index;
+
+	index = 0;
+	while (path_tokens[index])
+	{
+		final_path = search_tokens(cmd, path_tokens, index);
+		if (!final_path)
+			return (NULL);
+		if (access(final_path, F_OK | X_OK) == ACCESS_SUCCESS)
+			return (free_split(path_tokens), final_path);
+		free(final_path);
+		index++;
+	}
+	free_split(path_tokens);
+	return (NULL);
+}
+
 char	*find_executable_path(char *cmd, char **envp)
 {
 	char	**path_tokens;
@@ -37,31 +72,6 @@ char	*find_executable_path(char *cmd, char **envp)
 	if (!path_tokens)
 		return (NULL);
 	return (search_in_path_tokens(cmd, path_tokens));
-}
-
-char	*search_in_path_tokens(char *cmd, char **path_tokens)
-{
-	char	*partial_path;
-	char	*final_path;
-	int		index;
-
-	index = 0;
-	while (path_tokens[index])
-	{
-		partial_path = ft_strjoin(path_tokens[index], SLASH_STRING);
-		if (!partial_path)
-			return (free_split(path_tokens), NULL);
-		final_path = ft_strjoin(partial_path, cmd);
-		free(partial_path);
-		if (!final_path)
-			return (free_split(path_tokens), NULL);
-		if (access(final_path, F_OK | X_OK) == ACCESS_SUCCESS)
-			return (free_split(path_tokens), final_path);
-		free(final_path);
-		index++;
-	}
-	free_split(path_tokens);
-	return (NULL);
 }
 
 char	*get_executable_path(char *cmd, char **envp)
