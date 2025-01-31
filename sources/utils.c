@@ -13,6 +13,15 @@
 #include "libft.h"
 #include "pipex.h"
 
+/**
+ * @brief Frees a split string array
+ * 
+ * This function frees the memory allocated for a split string array.
+ * It iterates through the array, frees each string, 
+	* and then frees the array itself.
+ * 
+ * @param split Pointer to the split string array
+ */
 void	free_split(char **split)
 {
 	int	i;
@@ -28,6 +37,17 @@ void	free_split(char **split)
 	free(split);
 }
 
+/**
+ * @brief Frees allocated memory and exits the program with an error
+ * 
+ * This function frees allocated memory and exits the program with an error.
+ * It handles file descriptors, frees split strings, and prints an error message.
+ * 
+ * @param err Error message to display
+ * @param p Pointer to the program parameters and state
+ * @param perr Flag to indicate if an error message should be printed
+ * @param exit_status Exit status to return
+ */
 void	free_and_exit_failure(char *err, t_params *p, int perr, int exit_status)
 {
 	int	in_fd;
@@ -48,6 +68,18 @@ void	free_and_exit_failure(char *err, t_params *p, int perr, int exit_status)
 	exit(exit_status);
 }
 
+/**
+ * @brief Executes a process with proper error handling and resource management
+ * 
+ * This function handles the execution of a process. 
+	* It checks which side of the pipe to handle and calls 
+	* the appropriate function to set up the pipe.
+ * 
+ * @param p Pointer to the program parameters and state
+ * @param fd Pipe file descriptors
+ * @param envp Environment variables array
+ * @param side Flag to indicate which side of the pipe to handle
+ */
 void	exec_process(t_params *p, int *fd, char **envp, int side)
 {
 	if (side == LEFT_PIPE)
@@ -56,6 +88,14 @@ void	exec_process(t_params *p, int *fd, char **envp, int side)
 		handle_right_pipe(p, fd, envp);
 }
 
+/**
+ * @brief Validates the pipes and commands arguments
+ * 
+ * This function checks if the pipes and commands arguments are valid.
+ * It handles memory allocation errors and invalid command errors.
+ * 
+ * @param params Pointer to the program parameters and state
+ */
 void	validates_pipes_commands_args(t_params *params)
 {
 	if (params->left_cmd_args == NULL || params->right_cmd_args == NULL)
@@ -65,6 +105,15 @@ void	validates_pipes_commands_args(t_params *params)
 			INVALID_PIPE_CMD_MSG, params, NO_PERROR, EXIT_FAILURE);
 }
 
+/**
+ * @brief Configures the arguments for the left and right commands
+ * 
+ * This function splits the command arguments and validates them.
+ * It also opens the input and output files.
+ * 
+ * @param params Pointer to the program parameters and state
+ * @param argv Command line arguments
+ */
 void	configure_arguments(t_params *params, char **argv)
 {
 	params->left_cmd_args = ft_split(argv[2], SPACE_CHAR);

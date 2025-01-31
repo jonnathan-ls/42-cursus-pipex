@@ -6,13 +6,23 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/30 21:33:56 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/31 00:39:48 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex.h"
 
+/**
+ * @brief Retrieves the PATH environment variable from the environment array
+ * 
+ * This function searches through the environment array for the PATH variable.
+ * It returns the value of the PATH variable if found, or NULL if not found.
+ * 
+ * @param envp Pointer to the environment array
+ * @param index Index of the environment variable to check
+ * @return char* Pointer to the PATH environment variable, or NULL if not found
+ */
 static char	*get_path_token(char **envp, int index)
 {
 	if (!envp || !envp[index])
@@ -22,6 +32,18 @@ static char	*get_path_token(char **envp, int index)
 	return (get_path_token(envp, index + 1));
 }
 
+/**
+ * @brief Searches for the executable path in the given path tokens
+ * 
+ * This function constructs a full path by appending 
+	* the command to the path token.
+ * It returns the constructed path if found, or NULL if not found.
+ * 
+ * @param cmd Command to search for
+ * @param tokens Path tokens to search in
+ * @param index Index of the path token to use
+ * @return char* Full path to the executable, or NULL if not found
+ */
 static char	*search_tokens(char *cmd, char **tokens, int index)
 {
 	char	*partial;
@@ -37,6 +59,19 @@ static char	*search_tokens(char *cmd, char **tokens, int index)
 	return (final);
 }
 
+/**
+ * @brief Searches for the executable path in the given path tokens
+ * 
+ * This function iterates through the path
+	* tokens and constructs a full path by
+ * appending the command to each path token. 
+	* It returns the first valid path found,
+ * or NULL if no valid path is found.
+ * 
+ * @param cmd Command to search for
+ * @param path_tokens Path tokens to search in
+ * @return char* Full path to the executable, or NULL if not found
+ */
 char	*search_in_path_tokens(char *cmd, char **path_tokens)
 {
 	char	*final_path;
@@ -57,6 +92,16 @@ char	*search_in_path_tokens(char *cmd, char **path_tokens)
 	return (NULL);
 }
 
+/**
+ * @brief Finds the executable path for the given command
+ * 
+ * This function retrieves the PATH environment variable, splits it into tokens,
+ * and searches for the executable path in the given path tokens.
+ * 
+ * @param cmd Command to search for
+ * @param envp Environment variables array
+ * @return char* Full path to the executable, or NULL if not found
+ */
 char	*find_executable_path(char *cmd, char **envp)
 {
 	char	**path_tokens;
@@ -67,6 +112,17 @@ char	*find_executable_path(char *cmd, char **envp)
 	return (search_in_path_tokens(cmd, path_tokens));
 }
 
+/**
+ * @brief Retrieves the executable path for the given command
+ * 
+ * This function checks if the command is a full path or a relative path.
+ * It returns the command itself if it's a full path and accessible,
+ * or NULL if not found.
+ * 
+ * @param cmd Command to search for
+ * @param envp Environment variables array
+ * @return char* Full path to the executable, or NULL if not found
+ */
 char	*get_executable_path(char *cmd, char **envp)
 {
 	if (ft_strchr(cmd, SLASH_CHAR))
