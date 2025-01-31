@@ -6,13 +6,12 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/30 21:22:36 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/31 00:14:55 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
 #include "libft.h"
-#include "ft_printf.h"
+#include "pipex.h"
 
 static void	handle_signals(void)
 {
@@ -47,10 +46,10 @@ int	pipex(t_params *params, char **envp)
 	handle_signals();
 	if (create_first_child(params, envp, pipefd, &pid_child_process[0]))
 		return (PROCESS_FAILURE);
+	close(pipefd[1]);
 	if (create_second_child(params, envp, pipefd, &pid_child_process[1]))
 		return (PROCESS_FAILURE);
 	close(pipefd[0]);
-	close(pipefd[1]);
 	return (wait_for_children(pid_child_process[0], pid_child_process[1]));
 }
 

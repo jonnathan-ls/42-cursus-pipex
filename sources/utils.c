@@ -10,9 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
 #include "libft.h"
-#include "ft_printf.h"
+#include "pipex.h"
 
 void	free_split(char **split)
 {
