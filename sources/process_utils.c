@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/30 00:50:02 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:12:02 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,24 +14,23 @@
 #include "libft.h"
 #include "ft_printf.h"
 
-static void	execute_command(t_params *params, char **cmd_args, char **envp)
+static void	execute_command(t_params *p, char **cmd, char **env)
 {
 	char	*path;
+	int		is_allocated;
 
-	if (!cmd_args || !cmd_args[0])
-	{
-		free_and_exit_failure("Invalid command", params, PERROR, EXIT_FAILURE);
-	}
-	path = get_executable_path(cmd_args[0], envp);
+	is_allocated = 0;
+	path = get_executable_path(cmd[0], env);
 	if (!path)
 	{
-		ft_putstr_fd(cmd_args[0], 2);
-		free_and_exit_failure(": command not found\n", params, PERROR, 127);
+		ft_putstr_fd(cmd[0], 2);
+		free_and_exit_failure(": command not found\n", p, 0, 127);
 	}
-	execve(path, cmd_args, envp);
-	free(path);
-	perror(cmd_args[0]);
-	free_and_exit_failure(NULL, params, PERROR, 126);
+	is_allocated = (ft_strchr(cmd[0], SLASH_CHAR) == NULL);
+	execve(path, cmd, env);
+	if (is_allocated)
+		free(path);
+	free_and_exit_failure(cmd[0], p, 1, 126);
 }
 
 int	create_first_child(t_params *params, char **envp, int *pipefd, pid_t *pid)

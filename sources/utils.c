@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/30 20:34:15 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:11:27 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,21 +29,23 @@ void	free_split(char **split)
 	free(split);
 }
 
-void	free_and_exit_failure(
-	char *err_msg, t_params *params, int perror_msg, int exit_status)
+void	free_and_exit_failure(char *err, t_params *p, int perr, int exit_status)
 {
-	if (params->left_cmd_args)
-		free_split(params->left_cmd_args);
-	if (params->right_cmd_args)
-		free_split(params->right_cmd_args);
-	if (params->fds.input_file > STDERR_FILENO)
-		close(params->fds.input_file);
-	if (params->fds.output_file > STDERR_FILENO)
-		close(params->fds.output_file);
-	if (perror_msg)
-		perror(err_msg);
+	int	in_fd;
+	int	out_fd;
+
+	in_fd = p->fds.input_file;
+	out_fd = p->fds.output_file;
+	free_split(p->left_cmd_args);
+	free_split(p->right_cmd_args);
+	if (in_fd > 2)
+		close(in_fd);
+	if (out_fd > 2)
+		close(out_fd);
+	if (perr)
+		perror(err);
 	else
-		ft_putstr_fd(err_msg, STDERR_FILENO);
+		ft_putstr_fd(err, 2);
 	exit(exit_status);
 }
 
