@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/30 21:11:27 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:17:04 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,14 @@ void	free_and_exit_failure(char *err, t_params *p, int perr, int exit_status)
 	out_fd = p->fds.output_file;
 	free_split(p->left_cmd_args);
 	free_split(p->right_cmd_args);
-	if (in_fd > 2)
+	if (in_fd > STDERR_FILENO)
 		close(in_fd);
-	if (out_fd > 2)
+	if (out_fd > STDERR_FILENO)
 		close(out_fd);
 	if (perr)
 		perror(err);
 	else
-		ft_putstr_fd(err, 2);
+		ft_putstr_fd(err, STDERR_FILENO);
 	exit(exit_status);
 }
 

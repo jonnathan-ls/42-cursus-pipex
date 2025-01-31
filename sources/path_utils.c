@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/30 21:04:17 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:20:30 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static char	*get_path_token(char **envp, int index)
 	if (!envp || !envp[index])
 		return (NULL);
 	if (ft_strnstr(envp[index], PATH_ENV_VAR, PATH_ENV_VAR_LENGTH))
-		return (envp[index] + PATH_ENV_VAR_LENGTH + 1);
+		return (envp[index] + PATH_PREFIX_LENGTH);
 	return (get_path_token(envp, index + 1));
 }
 

@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/30 20:55:11 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:22:36 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static int	wait_for_children(pid_t pid_child_one, pid_t pid_child_two)
 	else if (WIFSIGNALED(status))
 		exit_status = SIGNAL_BASE + WTERMSIG(status);
 	else
-		exit_status = 1;
+		exit_status = DEFAULT_ERR_STATUS;
 	return (exit_status);
 }
 
@@ -43,7 +43,7 @@ int	pipex(t_params *params, char **envp)
 	pid_t	pid_child_process[2];
 
 	if (pipe(pipefd) == PROCESS_FAILURE)
-		free_and_exit_failure(PIPE_MSG, params, PERROR, EXIT_FAILURE);
+		free_and_exit_failure(PIPE_FAIL_MSG, params, PERROR, EXIT_FAILURE);
 	handle_signals();
 	if (create_first_child(params, envp, pipefd, &pid_child_process[0]))
 		return (PROCESS_FAILURE);
