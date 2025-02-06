@@ -6,28 +6,13 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/31 00:38:19 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/02/06 20:23:54 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex.h"
 
-/**
- * @brief Handles signals for the pipex program
- * 
- * This function sets up signal handlers for SIGPIPE, SIGINT, and SIGQUIT.
- * It ensures that the default signal handlers are used for these signals.
- * 
- * @note This function does not return - 
-	* it sets up signal handlers and returns immediately.
- */
-static void	handle_signals(void)
-{
-	signal(SIGPIPE, SIG_DFL);
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
-}
 
 /**
  * @brief Waits for the children processes to finish and returns the exit status
@@ -72,7 +57,6 @@ static int	pipex(t_params *params, char **envp)
 
 	if (pipe(pipefd) == PROCESS_FAILURE)
 		free_and_exit_failure(PIPE_FAIL_MSG, params, PERROR, EXIT_FAILURE);
-	handle_signals();
 	if (create_first_child(params, envp, pipefd, &pid_child_process[0]))
 		return (PROCESS_FAILURE);
 	close(pipefd[1]);
