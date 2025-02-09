@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/30 21:29:15 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/02/09 15:38:25 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,12 @@
 # define SLASH_STRING "/"
 # define PATH_ENV_VAR "PATH"
 # define DOUBLE_COLON_CHAR ':'
+
+/**
+	* Valor em octal que define as permissões de 
+	* leitura e escrita para o proprietário do arquivo, 
+	* e apenas permissões de leitura para o grupo e outros usuários.
+ */
 # define MODE_PERMISSION_FILE 0644
 
 // Exit Codes
@@ -37,7 +43,7 @@
 # define NO_PERROR 0
 # define RIGHT_PIPE 1
 # define ACCESS_SUCCESS 0
-# define PROCESS_SUCCESS 0
+# define PROCESS_SUCCESS 1
 # define PROCESS_FAILURE -1
 
 // Path Handling

@@ -6,7 +6,7 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/01/31 00:39:48 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/02/09 15:46:14 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ static char	*get_path_token(char **envp, int index)
  * @param index Index of the path token to use
  * @return char* Full path to the executable, or NULL if not found
  */
-static char	*search_tokens(char *cmd, char **tokens, int index)
+static char	*get_path(char *cmd, char **tokens, int index)
 {
 	char	*partial;
 	char	*final;
@@ -74,18 +74,18 @@ static char	*search_tokens(char *cmd, char **tokens, int index)
  */
 char	*search_in_path_tokens(char *cmd, char **path_tokens)
 {
-	char	*final_path;
+	char	*path;
 	int		index;
 
 	index = 0;
 	while (path_tokens[index])
 	{
-		final_path = search_tokens(cmd, path_tokens, index);
-		if (!final_path)
+		path = get_path(cmd, path_tokens, index);
+		if (!path)
 			return (NULL);
-		if (access(final_path, F_OK | X_OK) == ACCESS_SUCCESS)
-			return (free_split(path_tokens), final_path);
-		free(final_path);
+		if (access(path, F_OK | X_OK) == ACCESS_SUCCESS)
+			return (free_split(path_tokens), path);
+		free(path);
 		index++;
 	}
 	free_split(path_tokens);

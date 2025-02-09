@@ -6,13 +6,12 @@
 /*   By: jlacerda <jlacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:25:59 by jlacerda          #+#    #+#             */
-/*   Updated: 2025/02/06 20:23:54 by jlacerda         ###   ########.fr       */
+/*   Updated: 2025/02/09 15:38:43 by jlacerda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex.h"
-
 
 /**
  * @brief Waits for the children processes to finish and returns the exit status
@@ -57,10 +56,10 @@ static int	pipex(t_params *params, char **envp)
 
 	if (pipe(pipefd) == PROCESS_FAILURE)
 		free_and_exit_failure(PIPE_FAIL_MSG, params, PERROR, EXIT_FAILURE);
-	if (create_first_child(params, envp, pipefd, &pid_child_process[0]))
+	if (!create_first_child(params, envp, pipefd, &pid_child_process[0]))
 		return (PROCESS_FAILURE);
 	close(pipefd[1]);
-	if (create_second_child(params, envp, pipefd, &pid_child_process[1]))
+	if (!create_second_child(params, envp, pipefd, &pid_child_process[1]))
 		return (PROCESS_FAILURE);
 	close(pipefd[0]);
 	return (wait_for_children(pid_child_process[0], pid_child_process[1]));
